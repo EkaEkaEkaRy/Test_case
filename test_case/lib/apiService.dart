@@ -4,7 +4,7 @@ import 'package:test_case/models/user.dart';
 class Apiservice {
   // инициализация библиотек
   final Dio _dio = Dio();
-  final ip = '';
+  final ip = '192.168.1.121';
 
   // получение всех пользователей
   Future<List<User>> getUsers() async {
