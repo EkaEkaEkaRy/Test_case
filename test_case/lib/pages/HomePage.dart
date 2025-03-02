@@ -67,9 +67,6 @@ class _HomePageState extends State<HomePage> {
                   _nameController.text.isNotEmpty &&
                   _surnameController.text.isNotEmpty) {
                 Navigator.pop(context, true);
-              } else {
-                ScaffoldMessenger.maybeOf(context)?.showSnackBar(
-                    SnackBar(content: Text('Есть незаполненные поля')));
               }
             },
           ),
@@ -98,9 +95,8 @@ class _HomePageState extends State<HomePage> {
             // добавление пользователя
             _apiService.addProduct(person);
           }
-          //Navigator.pop(context);
         });
-        Navigator.pop(context);
+
         // сообщение о подтверждении действия
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -156,9 +152,11 @@ Widget UsersList(List<User> users, BuildContext context, Function addUser) {
       ? Center(child: Text('Нет пользователей'))
       // вывод списка пользователей
       : ListView.builder(
-          itemCount: users.length,
+          itemCount: users.length + 1,
           itemBuilder: (BuildContext context, int index) {
-            return UserContainer(users[index], context, addUser);
+            return index == users.length
+                ? SizedBox(height: 60)
+                : UserContainer(users[index], context, addUser);
           });
 }
 
