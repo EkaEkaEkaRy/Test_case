@@ -47,6 +47,10 @@ var users = []User{
 	},
 }
 
+type Response struct {
+	Message string `json:"message"`
+}
+
 // обработчик для GET-запроса
 func getUsersHandler(w http.ResponseWriter, r *http.Request) {
 	// Устанавливаем заголовки для правильного формата JSON
@@ -120,7 +124,9 @@ func deleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	for i, Product := range users {
 		if Product.ID == id {
 			users = append(users[:i], users[i+1:]...)
-			w.WriteHeader(http.StatusNoContent)
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(http.StatusOK)
+			json.NewEncoder(w).Encode(Response{Message: "User deleted successfully"})
 			return
 		}
 	}
