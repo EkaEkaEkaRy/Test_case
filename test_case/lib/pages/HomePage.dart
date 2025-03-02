@@ -11,6 +11,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final _apiService = Apiservice();
+  Future<List<User>>? _futureUsers;
+
+  @override
+  void initState() {
+    super.initState();
+    // Загружаем список пользователей при старте
+    _fetchUsers();
+  }
+
+  // обновление списка
+  void _fetchUsers() {
+    setState(() {
+      _futureUsers = _apiService.getUsers();
+    });
+  }
 
   // диалоговое окно добавления или редактирования пользователя
   void _addUser(BuildContext context, User? user) {
@@ -87,38 +102,67 @@ class _HomePageState extends State<HomePage> {
             name: _nameController.text,
             surname: _surnameController.text,
             image: _imageController.text);
-        if (user != null) {
-          // обновление пользователя
-          await _apiService.updateUser(person);
-        } else {
-          // добавление пользователя
-          await _apiService.addProduct(person);
+        try {
+          if (user != null) {
+            // обновление пользователя
+            await _apiService.updateUser(person);
+          } else {
+            // добавление пользователя
+            await _apiService.addProduct(person);
+          }
+          // обновляем список после изменения
+          _fetchUsers();
+          setState(() {});
+          // сообщение о подтверждении действия
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  user != null
+                      ? 'Пользователь изменен'
+                      : 'Пользователь добавлен',
+                  style: TextStyle(color: Colors.black, fontSize: 16.0)),
+              backgroundColor: const Color.fromARGB(255, 43, 255, 0),
+            ),
+          );
+        } catch (e) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  user != null
+                      ? 'Не удалось изменить пользователя'
+                      : 'Не удалось добавить пользователя',
+                  style: TextStyle(color: Colors.white, fontSize: 16.0)),
+              backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+            ),
+          );
         }
-        setState(() {});
-        // сообщение о подтверждении действия
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-                user != null ? 'Пользователь изменен' : 'Пользователь добавлен',
-                style: TextStyle(color: Colors.black, fontSize: 16.0)),
-            backgroundColor: const Color.fromARGB(255, 43, 255, 0),
-          ),
-        );
       }
     });
   }
 
   void _deleteUser(BuildContext context, int id) async {
-    await _apiService.deleteUser(id);
-    setState(() {});
-    // сообщение о подтверждении действия
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Пользователь удален',
-            style: TextStyle(color: Colors.black, fontSize: 16.0)),
-        backgroundColor: const Color.fromARGB(255, 43, 255, 0),
-      ),
-    );
+    try {
+      await _apiService.deleteUser(id);
+      // обновляем список после удаления
+      _fetchUsers();
+      setState(() {});
+      // сообщение о подтверждении действия
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Пользователь удален',
+              style: TextStyle(color: Colors.black, fontSize: 16.0)),
+          backgroundColor: const Color.fromARGB(255, 43, 255, 0),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Не удалось удалить пользователя',
+              style: TextStyle(color: Colors.white, fontSize: 16.0)),
+          backgroundColor: const Color.fromARGB(255, 255, 0, 0),
+        ),
+      );
+    }
   }
 
   @override
@@ -135,7 +179,7 @@ class _HomePageState extends State<HomePage> {
       ),
       // Получение списка пользователей пользователей
       body: FutureBuilder(
-          future: _apiService.getUsers(),
+          future: _futureUsers,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // ожидание списка
