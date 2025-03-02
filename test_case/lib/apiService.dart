@@ -2,9 +2,11 @@ import 'package:dio/dio.dart';
 import 'package:test_case/models/user.dart';
 
 class Apiservice {
+  // инициализация библиотек
   final Dio _dio = Dio();
   final ip = '';
 
+  // получение всех пользователей
   Future<List<User>> getUsers() async {
     try {
       final response = await _dio.get('http://$ip:8080/users');
@@ -22,6 +24,7 @@ class Apiservice {
     }
   }
 
+  // получение одного пользователя по id
   Future<User> getUserByID(int id) async {
     try {
       final response = await _dio.get('http://$ip:8080/users/$id');
@@ -36,6 +39,7 @@ class Apiservice {
     }
   }
 
+  // добавление нового пользователя
   Future<void> addProduct(User person) async {
     final link = 'http://$ip:8080/users/create';
     try {
@@ -54,6 +58,7 @@ class Apiservice {
     }
   }
 
+  // одновление пользователя по id
   Future<void> updateUser(User person) async {
     final link = 'http://$ip:8080/users/update/${person.id}';
     try {
@@ -72,6 +77,7 @@ class Apiservice {
     }
   }
 
+  // удаление пользователя по id
   Future<void> deleteUser(int id) async {
     final link = 'http://$ip:8080/users/delete/$id';
     try {
