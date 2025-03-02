@@ -13,7 +13,7 @@ class _HomePageState extends State<HomePage> {
   final _apiService = Apiservice();
 
   // диалоговое окно добавления или редактирования пользователя
-  void addUser(BuildContext context, User? user) {
+  void _addUser(BuildContext context, User? user) {
     final TextEditingController _imageController = TextEditingController();
     final TextEditingController _nameController = TextEditingController();
     final TextEditingController _surnameController = TextEditingController();
@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-    ).then((bool? isConfirm) {
+    ).then((bool? isConfirm) async {
       // если добавление или изменение подтверждено
       if (isConfirm != null && isConfirm) {
         final User person = User(
@@ -87,15 +87,13 @@ class _HomePageState extends State<HomePage> {
             name: _nameController.text,
             surname: _surnameController.text,
             image: _imageController.text);
-        setState(() {
-          if (user != null) {
-            // обновление пользователя
-            _apiService.updateUser(person);
-          } else {
-            // добавление пользователя
-            _apiService.addProduct(person);
-          }
-        });
+        if (user != null) {
+          // обновление пользователя
+          await _apiService.updateUser(person);
+        } else {
+          // добавление пользователя
+          await _apiService.addProduct(person);
+        }
 
         // сообщение о подтверждении действия
         ScaffoldMessenger.of(context).showSnackBar(
@@ -108,6 +106,12 @@ class _HomePageState extends State<HomePage> {
         );
       }
     });
+  }
+
+  void _deleteUser(BuildContext context, int id) async {
+    await _apiService.deleteUser(id);
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text('Пользователь удален')));
   }
 
   @override
@@ -136,17 +140,18 @@ class _HomePageState extends State<HomePage> {
               return Center(child: Text('Пользователи не найдены'));
             }
             final usersList = snapshot.data!;
-            return UsersList(usersList, context, addUser);
+            return UsersList(usersList, context, _addUser, _deleteUser);
           }),
       // Кнопка добавления
       floatingActionButton: FloatingActionButton(
-          onPressed: () => addUser(context, null), child: Icon(Icons.add)),
+          onPressed: () => _addUser(context, null), child: Icon(Icons.add)),
     );
   }
 }
 
 // виджет списка пользователей
-Widget UsersList(List<User> users, BuildContext context, Function addUser) {
+Widget UsersList(List<User> users, BuildContext context, Function _addUser,
+    Function _deleteUser) {
   return users.length == 0
       // если список пустой
       ? Center(child: Text('Нет пользователей'))
@@ -156,12 +161,13 @@ Widget UsersList(List<User> users, BuildContext context, Function addUser) {
           itemBuilder: (BuildContext context, int index) {
             return index == users.length
                 ? SizedBox(height: 60)
-                : UserContainer(users[index], context, addUser);
+                : UserContainer(users[index], context, _addUser, _deleteUser);
           });
 }
 
 // контейнер пользователя
-Widget UserContainer(User user, BuildContext context, Function addUser) {
+Widget UserContainer(
+    User user, BuildContext context, Function _addUser, Function _deleteUser) {
   return Padding(
     padding: const EdgeInsets.all(8.0),
     child: Container(
@@ -214,9 +220,11 @@ Widget UserContainer(User user, BuildContext context, Function addUser) {
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               IconButton(
-                  onPressed: () => addUser(context, user),
+                  onPressed: () => _addUser(context, user),
                   icon: Icon(Icons.edit)),
-              IconButton(onPressed: () {}, icon: Icon(Icons.delete))
+              IconButton(
+                  onPressed: () => _deleteUser(context, user.id),
+                  icon: Icon(Icons.delete))
             ],
           )
         ],
