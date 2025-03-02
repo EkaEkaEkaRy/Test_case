@@ -12,6 +12,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.greenAccent,
+      // Хедер страницы
       appBar: AppBar(
         title: Text(
           'Список пользователей',
@@ -19,11 +20,13 @@ class _HomePageState extends State<HomePage> {
         ),
         backgroundColor: Colors.green,
       ),
+      // Список пользователей
       body: ListView.builder(
           itemCount: 4,
           itemBuilder: (BuildContext context, int index) {
             return Container();
           }),
+      // Кнопка добавления
       floatingActionButton:
           FloatingActionButton(onPressed: () {}, child: Icon(Icons.add)),
     );
