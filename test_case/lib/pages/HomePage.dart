@@ -94,7 +94,7 @@ class _HomePageState extends State<HomePage> {
           // добавление пользователя
           await _apiService.addProduct(person);
         }
-
+        setState(() {});
         // сообщение о подтверждении действия
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -110,8 +110,15 @@ class _HomePageState extends State<HomePage> {
 
   void _deleteUser(BuildContext context, int id) async {
     await _apiService.deleteUser(id);
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text('Пользователь удален')));
+    setState(() {});
+    // сообщение о подтверждении действия
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Пользователь удален',
+            style: TextStyle(color: Colors.black, fontSize: 16.0)),
+        backgroundColor: const Color.fromARGB(255, 43, 255, 0),
+      ),
+    );
   }
 
   @override
