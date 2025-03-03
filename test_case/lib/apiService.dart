@@ -1,15 +1,15 @@
 import 'package:dio/dio.dart';
+import 'package:test_case/backend_link.dart';
 import 'package:test_case/models/user.dart';
 
 class Apiservice {
   // инициализация библиотек
   final Dio _dio = Dio();
-  final ip = '192.168.1.121';
 
   // получение всех пользователей
   Future<List<User>> getUsers() async {
     try {
-      final response = await _dio.get('http://$ip:8080/users');
+      final response = await _dio.get('${backend_link}users');
       if (response.statusCode == 200) {
         List<User> users = (response.data as List)
             .map((users) => User.parseJson(users))
@@ -27,7 +27,7 @@ class Apiservice {
   // получение одного пользователя по id
   Future<User> getUserByID(int id) async {
     try {
-      final response = await _dio.get('http://$ip:8080/users/$id');
+      final response = await _dio.get('${backend_link}users/$id');
       if (response.statusCode == 200) {
         User user = User.parseJson(response.data);
         return user;
@@ -41,7 +41,7 @@ class Apiservice {
 
   // добавление нового пользователя
   Future<void> addProduct(User person) async {
-    final link = 'http://$ip:8080/users/create';
+    final link = '${backend_link}users/create';
     try {
       final response = await _dio.post(link, data: {
         'Name': person.name,
@@ -60,7 +60,7 @@ class Apiservice {
 
   // одновление пользователя по id
   Future<void> updateUser(User person) async {
-    final link = 'http://$ip:8080/users/update/${person.id}';
+    final link = '${backend_link}users/update/${person.id}';
     try {
       final response = await _dio.put(link, data: {
         'Name': person.name,
@@ -79,7 +79,7 @@ class Apiservice {
 
   // удаление пользователя по id
   Future<void> deleteUser(int id) async {
-    final link = 'http://$ip:8080/users/delete/$id';
+    final link = '${backend_link}users/delete/$id';
     try {
       final response = await _dio.delete(link);
       if (response.statusCode == 200) {
